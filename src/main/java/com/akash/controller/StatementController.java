@@ -216,7 +216,7 @@ public class StatementController {
         statements.addAll(rawMaterialEntries);
         statements.addAll(dayCreditEntries);
         statements.addAll(dayDebitEntries);
-        Collections.sort(statements, (a, b) -> a.getDate().compareTo(b.getDate()));
+        Collections.sort(statements, (a, b) -> a.getLocalDate().compareTo(b.getLocalDate()));
         for (DealerStatement s : statements) {
             if ("RawMaterial".equals(s.getType())) {
                 s.setBalance(balance + s.getDebit());
@@ -256,7 +256,7 @@ public class StatementController {
         statements.addAll(manufactureEntries);
         statements.addAll(dayDebitEntries);
         statements.addAll(dayCreditEntries);
-        Collections.sort(statements, (a, b) -> a.getDate().compareTo(b.getDate()));
+        Collections.sort(statements, (a, b) -> a.getLocalDate().compareTo(b.getLocalDate()));
         for (LabourStatement s : statements) {
             if ("Manufactre".equals(s.getType())) {
                 s.setBalance(balance + s.getDebit());
@@ -289,7 +289,7 @@ public class StatementController {
         AppUser owner = this.appUserRepo.findById(search.getUser()).orElse(null);
         Double balance = prevBalance = Double.valueOf(CommonMethods.getOwnerCredit(search.getUser(), LocalDate.MIN, previousDay, this.dayBookRepo, this.appUserRepo) - CommonMethods.getOwnerDebit(search.getUser(), LocalDate.MIN, previousDay, this.dayBookRepo, this.appUserRepo));
         List<OwnerStatement> statements = this.dayBookRepo.findByAccountNumberAndDateBetween(owner.getAccountNumber(), search.getStartDate(), search.getEndDate());
-        Collections.sort(statements, (a, b) -> a.getDate().compareTo(b.getDate()));
+        Collections.sort(statements, (a, b) -> a.getLocalDate().compareTo(b.getLocalDate()));
         for (OwnerStatement s : statements) {
             if ("Expenditure".equals(s.getTransactionType())) {
                 s.setBalance(balance + s.getAmount());
@@ -309,7 +309,7 @@ public class StatementController {
     public List<CustomerStatement> generateCustomerStatement(StatementSearch search, Model model) {
         Double balance;
         LocalDate previousDay = search.getStartDate().minusDays(1L);
-        this.prevBalance = balance = Double.valueOf(CommonMethods.getCustomerCredit(search.getUser(), search.getStartDate(), previousDay, this.billBookRepo, this.dayBookRepo, this.goodsReturnRepository, this.clearDuesRepository) - CommonMethods.getCustomerDebit(search.getUser(), search.getStartDate(), previousDay, this.dayBookRepo));
+        this.prevBalance = balance = Double.valueOf(CommonMethods.getCustomerCredit(search.getUser(), LocalDate.MIN, previousDay, this.billBookRepo, this.dayBookRepo, this.goodsReturnRepository, this.clearDuesRepository) - CommonMethods.getCustomerDebit(search.getUser(), LocalDate.MIN, previousDay, this.dayBookRepo));
         List<BillBook> customerBillBook = this.billBookRepo.findByCustomer_IdAndDateBetween(search.getUser(), search.getStartDate(), search.getEndDate());
         List<CustomerStatement> billBookCreditEntries = BillBookToCustomerStatement.convert(customerBillBook);
         billBookCreditEntries.forEach(b -> b.setSales(this.billBookRepo.findSalesOnBillBookId(b.getId())));

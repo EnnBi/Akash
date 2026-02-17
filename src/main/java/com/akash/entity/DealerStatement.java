@@ -45,6 +45,10 @@ public class DealerStatement {
         return this.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     }
 
+    public LocalDate getLocalDate() {
+        return this.date;
+    }
+
     public void setDate(LocalDate date) {
         this.date = date;
     }
