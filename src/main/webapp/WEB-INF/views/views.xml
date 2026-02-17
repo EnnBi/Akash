@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC  "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"  "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">  
+ 
+<tiles-definitions> 
+	<definition name="base" template="/WEB-INF/views/layout/default.jsp">  
+       <put-attribute name="title" value="Dashboard" />  
+       <put-attribute name="header" value="/WEB-INF/views/layout/topnavbar.jsp" />  
+       <put-attribute name="menu" value="/WEB-INF/views/layout/menu.jsp" />  
+       <put-attribute name="body" value="" />  
+   </definition>  
+
+	 <definition name="index" extends="base">  
+       <put-attribute name="title" value="Dashboard" />  
+       <put-attribute name="body" value="/WEB-INF/views/index.jsp" />  
+   </definition>    
+   <definition name="template" extends="base">  
+       <put-attribute name="title" value="Dashboard" />  
+       <put-attribute name="body" value="/WEB-INF/views/template.jsp" />  
+   </definition> 
+   <definition name="site" extends="base">  
+       <put-attribute name="title" value="Site" />  
+       <put-attribute name="body" value="/WEB-INF/views/site.jsp" />  
+   </definition>   
+   <definition name="size" extends="base">  
+       <put-attribute name="title" value="Size" />  
+       <put-attribute name="body" value="/WEB-INF/views/size.jsp" />  
+   </definition> 
+    <definition name="material" extends="base">  
+       <put-attribute name="title" value="Material" />  
+       <put-attribute name="body" value="/WEB-INF/views/material.jsp" />  
+   </definition> 
+   <definition name="userType" extends="base">  
+       <put-attribute name="title" value="User Type" />  
+       <put-attribute name="body" value="/WEB-INF/views/userType.jsp" />  
+   </definition> 
+   <definition name="appUser" extends="base">  
+       <put-attribute name="title" value="User" />  
+       <put-attribute name="body" value="/WEB-INF/views/appUser.jsp" />  
+   </definition>
+   <definition name="userList" extends="base">  
+       <put-attribute name="title" value="Users" />  
+       <put-attribute name="body" value="/WEB-INF/views/userList.jsp" />  
+   </definition>
+    <definition name="product" extends="base">  
+       <put-attribute name="title" value="Product" />  
+       <put-attribute name="body" value="/WEB-INF/views/product.jsp" />  
+   </definition>
+    <definition name="vehicle" extends="base">  
+       <put-attribute name="title" value="Vehicle" />  
+       <put-attribute name="body" value="/WEB-INF/views/vehicle.jsp" />  
+   </definition>
+    <definition name="rawMaterial" extends="base">  
+       <put-attribute name="title" value="Raw Material" />  
+       <put-attribute name="body" value="/WEB-INF/views/rawMaterial.jsp" />  
+   </definition>
+    <definition name="rawList" extends="base">  
+       <put-attribute name="title" value="Raw Materials" />  
+       <put-attribute name="body" value="/WEB-INF/views/rawList.jsp" />  
+   </definition>
+   <definition name="billBook" extends="base">  
+       <put-attribute name="title" value="Bill Book" />  
+       <put-attribute name="body" value="/WEB-INF/views/billBook.jsp" />  
+   </definition>
+
+   <definition name="billBookSearch" extends="base">  
+       <put-attribute name="title" value="Bill Books" />  
+       <put-attribute name="body" value="/WEB-INF/views/billBookSearch.jsp" />  
+   </definition>
+     <definition name="billBookEdit" extends="base">  
+       <put-attribute name="title" value="Bill Book" />  
+       <put-attribute name="body" value="/WEB-INF/views/billBookEdit.jsp" />  
+   </definition>
+   <definition name="manufacture" extends="base">  
+       <put-attribute name="title" value="Manufacture" />  
+       <put-attribute name="body" value="/WEB-INF/views/manufacture.jsp" />  
+   </definition>
+   <definition name="manufactureEdit" extends="base">  
+       <put-attribute name="title" value="Manufacture" />  
+       <put-attribute name="body" value="/WEB-INF/views/manufactureEdit.jsp" />  
+   </definition>
+   <definition name="manufactureSearch" extends="base">
+		<put-attribute name="title" value="Manufactures" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/manufactureSearch.jsp" />
+	</definition>
+	<definition name="daybook" extends="base">
+		<put-attribute name="title" value="Daybook" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/daybook.jsp" />
+	</definition>
+	<definition name="daybookSearch" extends="base">
+		<put-attribute name="title" value="Daybook" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/daybookSearch.jsp" />
+	</definition>
+	<definition name="labourGroup" extends="base">
+		<put-attribute name="title" value="Daybook" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/labourGroup.jsp" />
+	</definition>
+	<definition name="labourCost" extends="base">
+		<put-attribute name="title" value="Daybook" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/labourCost.jsp" />
+	</definition>
+	<definition name="statement" extends="base">
+		<put-attribute name="title" value="Daybook" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/statement.jsp" />
+	</definition>
+	<definition name="inventory" extends="base">
+		<put-attribute name="title" value="Daybook" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/inventory.jsp" />
+	</definition>
+	
+	<definition name="cleardues" extends="base">
+		<put-attribute name="title" value="Daybook" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/cleardues.jsp" />
+	</definition>
+	<definition name="balancesheet" extends="base">
+		<put-attribute name="title" value="Daybook" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/balancesheet.jsp" />
+	</definition>
+	<definition name="goodsreturnsearch" extends="base">
+		<put-attribute name="title" value="Daybook" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/goodsReturnSearch.jsp" />
+	</definition>
+	<definition name="goodsreturnadd" extends="base">
+		<put-attribute name="title" value="Daybook" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/goodsReturnAdd.jsp" />
+	</definition>
+	 <definition name="goodsreturneditsearch" extends="base">
+		<put-attribute name="title" value="Daybook" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/goodsReturnEditSearch.jsp" />
+	</definition> 
+	
+</tiles-definitions>
