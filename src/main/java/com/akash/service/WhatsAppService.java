@@ -37,13 +37,15 @@ public class WhatsAppService {
      * @param fileName       File name (without .pdf extension)
      * @param toPhoneNumber  10-digit customer phone number (e.g. "9876543210")
      */
-    public void sendPdf(byte[] pdfBytes, String fileName, String toPhoneNumber) {
+    public boolean sendPdf(byte[] pdfBytes, String fileName, String toPhoneNumber) {
         try {
             String mediaId = uploadMedia(pdfBytes, fileName + ".pdf");
             sendDocumentMessage(mediaId, fileName + ".pdf", toPhoneNumber);
+            return true;
         } catch (Exception e) {
             System.err.println("WhatsApp send failed: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
     }
 

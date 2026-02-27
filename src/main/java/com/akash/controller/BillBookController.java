@@ -146,8 +146,13 @@ public class BillBookController {
         String phone = billBook.getCustomer() != null ? billBook.getCustomer().getContact() : null;
         if (phone != null && !phone.isEmpty()) {
             byte[] pdfBytes = this.generatePdfBytes(billBook, prevBalance, finalBalance);
-            this.whatsAppService.sendPdf(pdfBytes, billBook.getReceiptNumber(), phone);
-            redirectAttributes.addFlashAttribute("success", (Object)"Bill saved and sent on WhatsApp");
+            boolean sent = this.whatsAppService.sendPdf(pdfBytes, billBook.getReceiptNumber(), phone);
+            if (sent) {
+                redirectAttributes.addFlashAttribute("success", (Object)"Bill saved and sent on WhatsApp");
+            } else {
+                redirectAttributes.addFlashAttribute("success", (Object)"Bill saved successfully");
+                redirectAttributes.addFlashAttribute("fail", (Object)"WhatsApp sending failed");
+            }
         } else {
             redirectAttributes.addFlashAttribute("success", (Object)"Bill saved (no phone number found for WhatsApp)");
         }
