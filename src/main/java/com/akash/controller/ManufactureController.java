@@ -8,6 +8,8 @@ import com.akash.repository.ManufactureRepository;
 import com.akash.repository.ProductRepository;
 import com.akash.repository.SizeRepository;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,8 +47,27 @@ public class ManufactureController {
 
     @PostMapping(value={"/save"})
     public String save(@ModelAttribute(value="manufacture") Manufacture manufacture, Model model, RedirectAttributes redirectAttributes) {
-        manufacture.getLabourInfo().forEach(l -> l.setManufacture(manufacture));
-        this.manufactureRepository.save(manufacture);
+        List<com.akash.entity.LabourInfo> allRows = manufacture.getLabourInfo();
+        Map<Long, List<com.akash.entity.LabourInfo>> grouped = allRows.stream()
+            .collect(Collectors.groupingBy(l -> l.getSizeId() != null ? l.getSizeId() : 0L));
+        for (Map.Entry<Long, List<com.akash.entity.LabourInfo>> entry : grouped.entrySet()) {
+            Long sizeId = entry.getKey();
+            List<com.akash.entity.LabourInfo> rows = entry.getValue();
+            Manufacture m = new Manufacture();
+            m.setProduct(manufacture.getProduct());
+            m.setDate(manufacture.getDate());
+            m.setLabourGroup(manufacture.getLabourGroup());
+            m.setSize(this.sizeRepository.findById(sizeId).orElse(null));
+            double totalCement = rows.stream().mapToDouble(l -> l.getCement() != null ? l.getCement() : 0.0).sum();
+            double totalQty    = rows.stream().mapToDouble(l -> l.getQuantity() != null ? l.getQuantity() : 0.0).sum();
+            double totalAmt    = rows.stream().mapToDouble(l -> l.getTotalAmount() != null ? l.getTotalAmount() : 0.0).sum();
+            m.setCement(totalCement);
+            m.setTotalQuantity(totalQty);
+            m.setTotalAmount(totalAmt);
+            rows.forEach(l -> l.setManufacture(m));
+            m.setLabourInfo(rows);
+            this.manufactureRepository.save(m);
+        }
         redirectAttributes.addFlashAttribute("success", (Object)"Manufacture saved successfully");
         return "redirect:/manufacture";
     }

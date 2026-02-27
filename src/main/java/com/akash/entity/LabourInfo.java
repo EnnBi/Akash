@@ -12,6 +12,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -34,6 +35,10 @@ public class LabourInfo {
     @ManyToMany
     @JoinTable(name="Labourinfo_Labours")
     List<AppUser> labours;
+    @Transient
+    private Long sizeId;
+    @Transient
+    private Double cement;
 
     public long getId() {
         return this.id;
@@ -81,6 +86,22 @@ public class LabourInfo {
 
     public void setManufacture(Manufacture manufacture) {
         this.manufacture = manufacture;
+    }
+
+    public Long getSizeId() {
+        return this.sizeId;
+    }
+
+    public void setSizeId(Long sizeId) {
+        this.sizeId = sizeId;
+    }
+
+    public Double getCement() {
+        return this.cement;
+    }
+
+    public void setCement(Double cement) {
+        this.cement = cement;
     }
 
     public String toString() {

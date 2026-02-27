@@ -46,32 +46,13 @@ font-size: 1rem !important;
 				<div class="row">
 					<div class="col-md-6">
 						<div class="form-group row">
-							<label class="col-sm-3 col-form-label">Size</label>
+							<label class="col-sm-3 col-form-label">Labour Group</label>
 							<div class="col-sm-9">
-								<select class="form-control" id="size" name="size">
-									<option value="">Select size</option>
-								</select>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-3">
-						<div class="form-group row">
-							<label class="col-sm-6 col-form-label">Labour Group</label>
-							<div class="col-sm-6">
-								<form:hidden path="cpu" id="cpu"/>
 								<form:select path="labourGroup" class=" form-control" id="labourGroup" required="required">
 									<form:option value="">Select any Labour Group</form:option>
 									<form:options items="${labourGroups}" itemLabel="name"
 										itemValue="id" />
 								</form:select>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-3">
-						<div class="form-group row">
-							<label class="col-sm-6 col-form-label">Cement</label>
-							<div class="col-sm-6">
-								<form:input class="form-control" placeholder="Cement" path="cement" required="required"/>
 							</div>
 						</div>
 					</div>
@@ -92,31 +73,54 @@ font-size: 1rem !important;
 				<hr>
 				<div class="labour-info">
 					<div class="row">
+						<div class="col-md-5">
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Size</label>
+								<div class="col-sm-8">
+									<select class="form-control rowSize" name="labourInfo[0].sizeId" required>
+										<option value="">Select size</option>
+										<c:forEach items="${sizes}" var="s">
+											<option value="${s.id}">${s.name}</option>
+										</c:forEach>
+									</select>
+								</div>
+							</div>
+						</div>
 						<div class="col-md-4">
 							<div class="form-group row">
-								<label class="col-sm-4 col-form-label qtyLabel" >Quantity #1</label>
-								<div class="col-sm-8"> 
-									<form:input class="form-control quantity" placeholder="Quantity" path="labourInfo[0].quantity" required="required"/>
+								<label class="col-sm-5 col-form-label">Cement</label>
+								<div class="col-sm-7">
+									<input type="number" step="any" class="form-control rowCement" name="labourInfo[0].cement" placeholder="Cement" required/>
 								</div>
 							</div>
 						</div>
 						<div class="col-md-3">
 							<div class="form-group row">
-								<label class="col-sm-6 col-form-label">Total Amount</label>
-								<div class="col-sm-6">
+								<label class="col-sm-4 col-form-label qtyLabel">Quantity #1</label>
+								<div class="col-sm-8">
+									<form:input class="form-control quantity" placeholder="Quantity" path="labourInfo[0].quantity" required="required"/>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-5">
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Total Amount</label>
+								<div class="col-sm-8">
 									<form:input class="form-control totalAmt" placeholder="Total Amount" path="labourInfo[0].totalAmount" readonly="true"/>
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4">
+						<div class="col-md-5">
 							<div class="form-group row">
-								<label class="col-sm-7 col-form-label">Amount Per Head</label>
-								<div class="col-sm-5">
+								<label class="col-sm-5 col-form-label">Amount Per Head</label>
+								<div class="col-sm-7">
 									<form:input class="form-control amountPerHead" placeholder="Amount Per Head" path="labourInfo[0].amountPerHead" readonly="true"/>
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-1">
+						<div class="col-sm-2">
 							<button type="button" class="btn btn-danger delete">
 								<i class="mdi mdi-delete"></i>
 							</button>
@@ -178,12 +182,10 @@ font-size: 1rem !important;
 <script src="${pageContext.request.contextPath}/js/jquery.slim.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/select2.min.js" defer></script>
 <script type="text/javascript">
-$(document).ready(function(){    
+$(document).ready(function(){
 	var idArr=[];
 	$('.labors').select2();
-	
-	
-	
+
 	$("#add").click(function(){
 		$(".labour-info:last").clone().insertAfter(".labour-info:last");
 		$('.labors:last').parent().empty().append($('.labSel:last').clone());
@@ -191,75 +193,81 @@ $(document).ready(function(){
 		$('.labors:last').prop('required',true);
 		$('.labors:last').select2();
 		$('.labors:last').val(idArr).trigger('change');
-		$(".labour-info:last").find(':input').val('');
-		updateIndex()
+		$(".labour-info:last").find(':input').not('.rowSize, .rowCement, .labors').val('');
+		updateIndex();
+		var newRow = $('.labour-info:last')[0];
+		if ($(newRow).find('.rowSize').val()) {
+			getRate(newRow);
+		}
 	});
-	
+
 	$(document).on('click','.delete',function(e){
 		if($('.labour-info').length>1)
 			$(this).parent().parent().parent().remove();
 		updateIndex();
-		 updateAmountAndQuantity(); 
-	})
-	
+		updateAmountAndQuantity();
+	});
+
 	$('#labourGroup').change(function(){
-		getRate();
 		var id = $(this).val();
 		var url = "${pageContext.request.contextPath}/user/labour-group/" + id;
-		
 		$.get(url,function(data){
 			$('.labSel:last').find('option').remove();
 			$.each(data, function(key, value) {
-			$('.labSel:last').append($(
-			"<option></option>").attr(
-					"value", value.id).text(
-							value.code+" "+value.name));
+				$('.labSel:last').append($("<option></option>").attr("value", value.id).text(value.code+" "+value.name));
 			});
-			
 			$('.labors').get().forEach(function(entry, index, array) {
 				$(entry).find('option').remove();
 				$.each(data, function(key, value) {
-					$(entry).append($(
-							"<option></option>").attr(
-							"value", value.id).text(
-							value.code+" "+value.name));
+					$(entry).append($("<option></option>").attr("value", value.id).text(value.code+" "+value.name));
 					idArr.push(value.id);
 				});
 				$(entry).val(idArr).trigger('change');
 			});
 		});
+		$('.labour-info').each(function() {
+			if ($(this).find('.rowSize').val()) {
+				getRate(this);
+			}
+		});
 	});
-	
+
 	$('#product').change(function(){
 		var id = $(this).val();
 		var url = "${pageContext.request.contextPath}/product/" + id + "/sizes";
 		$.get(url,function(data){
-			$('#size').find('option').not(':first')
-			.remove();
-			$.each(data, function(key, value) {
-				$('#size').append($(
-						"<option></option>").attr(
-						"value", value.id).text(
-						value.name));
+			$('.rowSize').each(function() {
+				var sel = this;
+				$(sel).find('option').not(':first').remove();
+				$.each(data, function(key, value) {
+					$(sel).append($("<option></option>").attr("value", value.id).text(value.name));
+				});
+				$(sel).val('');
 			});
+			$('.labour-info').each(function() { $(this).data('cpu', 0); });
+			updateAmountAndQuantity();
 		});
-	})
-	
-	$(document).on('change','#cpu ,.quantity,.labors',function(){
-		debugger;
-		 updateAmountAndQuantity();
 	});
-	
-	function   updateAmountAndQuantity(){
-		var cpu = Number($('#cpu').val());
-		var totalQuantity=0,totalAmount=0;
+
+	$(document).on('change', '.rowSize', function(){
+		var labourInfoDiv = $(this).closest('.labour-info');
+		getRate(labourInfoDiv[0]);
+	});
+
+	$(document).on('change', '.quantity, .labors', function(){
+		updateAmountAndQuantity();
+	});
+
+	function updateAmountAndQuantity(){
+		var totalQuantity=0, totalAmount=0;
 		$('.quantity').get().forEach(function(entry, index, array) {
-			var labourInfoDiv = entry.closest(".labour-info")
+			var labourInfoDiv = entry.closest(".labour-info");
+			var cpu = Number($(labourInfoDiv).data('cpu') || 0);
 			var quantity = Number($(entry).val());
 			var totalAmt = Number(cpu*quantity);
 			$(labourInfoDiv).find(".totalAmt").val(totalAmt.toFixed(2));
-			var length  =  $(labourInfoDiv).find(".labors :selected").length;
-			aph = length>0?Number(totalAmt/length):0;
+			var length = $(labourInfoDiv).find(".labors :selected").length;
+			aph = length>0 ? Number(totalAmt/length) : 0;
 			$(labourInfoDiv).find('.amountPerHead').val(aph.toFixed(2));
 			totalAmount=totalAmount+totalAmt;
 			totalQuantity=totalQuantity+quantity;
@@ -267,36 +275,26 @@ $(document).ready(function(){
 		$('#totalQuantity').val(Number(totalQuantity.toFixed(2)));
 		$('#totalAmount').val(Number(totalAmount.toFixed(2)));
 	}
-	
+
 	function updateIndex() {
 		$('.labour-info').get().forEach(function(entry, index, array) {
-				$(entry).find('.qtyLabel').text('Quantity #'+(index+1))
-				$(entry).find('input, select').each(
-						function() {
-							var name = $(this).attr(
-									'name').replace(
-									/\[(.+?)\]/g,
-									"[" + index + "]");
-							$(this).attr('name', name)
-						});
+			$(entry).find('.qtyLabel').text('Quantity #'+(index+1));
+			$(entry).find('input, select').each(function() {
+				var n = $(this).attr('name');
+				if (n) $(this).attr('name', n.replace(/\[(.+?)\]/g, "[" + index + "]"));
 			});
+		});
 	}
-	$(document).on('change','#labourGroup,#product,#size',function(){
-		 getRate();
-		 /* console.log('going to set selected')
-		// $(".labors option").prop("selected", true);
-		 console.log($('.labors:last'));
-		 $('.labors:last').select2('destroy').find('option').prop('selected', 'selected').end().select2();
-		 //$('.labors:last').trigger('change');  */
-		 
-	});
-	function getRate(){
+
+	function getRate(labourInfoDiv){
 		var lg = $('#labourGroup').val();
-		var product=$('#product').val();
-		var size=$('#size').val();
+		var product = $('#product').val();
+		var size = $(labourInfoDiv).find('.rowSize').val();
+		if (!size) return;
 		var url = "${pageContext.request.contextPath}/labour-cost/rate?product="+product+"&size="+size+"&labourGroup="+lg;
 		$.get(url,function(data){
-			$('#cpu').val(data);
+			$(labourInfoDiv).data('cpu', Number(data));
+			updateAmountAndQuantity();
 		});
 	}
 
