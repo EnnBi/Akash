@@ -70,6 +70,18 @@
 						</div>
 					</div>
 				</div>
+				<div id="siteRow" class="row" style="display:none;">
+					<div class="col-md-6">
+						<div class="form-group row">
+							<label class="col-sm-3 col-form-label">Site</label>
+							<div class="col-sm-9">
+								<select class="form-control" name="site" id="siteInput">
+									<option value="">All Sites</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
 				<div class="form-group row float-right">
 					<button class="btn btn-primary btn-fw" type="submit" id="Search" name="excel">Export to Excel</button>
 				</div>
@@ -355,6 +367,20 @@
 							<label class="col-sm-6 col-form-label">${totalDebit}</label>
 						</div>
 					</div>  
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group row">
+							<label class="col-sm-6 col-form-label">Total Loading:</label>
+							<label class="col-sm-6 col-form-label">${totalLoading}</label>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group row">
+							<label class="col-sm-6 col-form-label">Total Unloading:</label>
+							<label class="col-sm-6 col-form-label">${totalUnloading}</label>
+						</div>
+					</div>
 				</div>
 			<div class="table-responsive">
 				<table class="table table-striped">
@@ -678,9 +704,40 @@
 <script>
 	$(document).ready(function(){
 		$('#users').select2();
+		var currentType = $('#type').val();
+		if (currentType === 'Customer' || currentType === 'Contractor') {
+			$('#siteRow').show();
+			var userId = $('#users').val();
+			if (userId) {
+				loadSites(userId);
+			}
+		}
 
+		$('#users').on('change', function() {
+			var userId = $(this).val();
+			var type = $('#type').val();
+			if (userId && (type === 'Customer' || type === 'Contractor')) {
+				loadSites(userId);
+			} else {
+				$('#siteInput').empty().append('<option value="">All Sites</option>');
+			}
+		});
 	});
-$('#type').change(
+
+	function loadSites(userId) {
+		var url = "${pageContext.request.contextPath}/bill-book/customer/" + userId + "/sites";
+		var prevSite = '${param.site}';
+		$.get(url, function(data) {
+			$('#siteInput').empty().append('<option value="">All Sites</option>');
+			$.each(data, function(i, site) {
+				var opt = $('<option></option>').val(site).text(site);
+				if (site === prevSite) opt.prop('selected', true);
+				$('#siteInput').append(opt);
+			});
+		});
+	}
+
+	$('#type').change(
 		function() {
 			var name = $(this).val();
 			var url = "${pageContext.request.contextPath}/user-type/" + name + "/users";
@@ -692,6 +749,12 @@ $('#type').change(
 									.text(value.name));
 				});
 			});
+			if (name === 'Customer' || name === 'Contractor') {
+				$('#siteRow').show();
+			} else {
+				$('#siteRow').hide();
+				$('#siteInput').empty().append('<option value="">All Sites</option>');
+			}
 		})
 		
 

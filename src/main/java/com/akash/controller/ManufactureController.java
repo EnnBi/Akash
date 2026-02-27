@@ -89,6 +89,42 @@ public class ManufactureController {
         return "manufactureSearch";
     }
 
+    @GetMapping(value={"/cement-consumption"})
+    public String cementConsumption(Model model) {
+        model.addAttribute("manufactureSearch", (Object)new ManufactureSearch());
+        return "cementConsumption";
+    }
+
+    @PostMapping(value={"/cement-consumption/search"})
+    public String cementConsumptionSearch(ManufactureSearch manufactureSearch, Model model, HttpSession session) {
+        session.setAttribute("cementSearch", (Object)manufactureSearch);
+        int page = 1;
+        this.cementPagination(page, manufactureSearch, model);
+        return "cementConsumption";
+    }
+
+    @GetMapping(value={"/cement-consumption/pageno={page}"})
+    public String cementConsumptionPage(@PathVariable(value="page") int page, HttpSession session, Model model) {
+        ManufactureSearch manufactureSearch = (ManufactureSearch)session.getAttribute("cementSearch");
+        this.cementPagination(page, manufactureSearch, model);
+        return "cementConsumption";
+    }
+
+    public void cementPagination(int page, ManufactureSearch manufactureSearch, Model model) {
+        page = page > 0 ? page : 1;
+        int from = 20 * (page - 1);
+        long records = this.manufactureRepository.countCementConsumption(manufactureSearch);
+        int total = (int)Math.ceil((double)records / 20.0);
+        List<Manufacture> manufactures = this.manufactureRepository.searchCementConsumption(manufactureSearch, from);
+        Double totalCement = this.manufactureRepository.sumCementBetweenDates(
+            manufactureSearch.getStartDate(), manufactureSearch.getEndDate());
+        model.addAttribute("totalPages", (Object)total);
+        model.addAttribute("currentPage", (Object)page);
+        model.addAttribute("manufactures", (Object)manufactures);
+        model.addAttribute("manufactureSearch", (Object)manufactureSearch);
+        model.addAttribute("totalCement", (Object)(totalCement != null ? totalCement : 0.0));
+    }
+
     public void pagination(int page, ManufactureSearch manufactureSearch, Model model) {
         page = page > 0 ? page : 1;
         this.from = 20 * (page - 1);

@@ -37,6 +37,7 @@ line-height: 10px
 							<div class="col-sm-8">
 								<form:input type="text" class="form-control"
 									path="receiptNumber" required="required" id="receipt" />
+								<div id="receiptInfo" class="mt-1"></div>
 							</div>
 						</div>
 					</div>
@@ -385,6 +386,10 @@ line-height: 10px
 							<input type="submit" class="btn btn-primary btn-fw" style="margin-right: 2rem;"
 								value="Submit And Print" name="print">
 						</div>
+						<div class="form-group row float-right">
+							<input type="submit" class="btn btn-info btn-fw" style="margin-right: 2rem;"
+								value="Submit And WhatsApp" name="whatsapp">
+						</div>
 					</div>
 				</div>
 			</form:form>
@@ -611,11 +616,24 @@ line-height: 10px
 
 						$('#receipt').change(function() {
 							var number = $(this).val();
-							var url = "${pageContext.request.contextPath}/bill-book/receipt/" + number;
+							if (!number) { $('#receiptInfo').html(''); return; }
+							var url = '${pageContext.request.contextPath}/bill-book/receipt/' + number;
 							$.get(url, function(data) {
-								if (data) {
-									alert('Receipt Number already exists');
-									$('#receipt').val('');
+								if (data && data.length > 0) {
+									var html = '<div class="card border-warning mt-2">'
+										+ '<div class="card-header bg-warning text-dark py-1 px-2" style="font-size:0.85rem;">'
+										+ '<strong>&#9888; Receipt <em>' + number + '</em> already used in ' + data.length + ' bill(s)</strong></div>'
+										+ '<div class="card-body p-0">'
+										+ '<table class="table table-sm table-bordered mb-0" style="font-size:0.82rem;table-layout:fixed;width:100%;">'
+										+ '<thead class="thead-light" style="display:table;width:100%;table-layout:fixed;"><tr><th style="width:30%">Date</th><th style="width:50%">Customer</th><th style="width:20%">Amount (&#8377;)</th></tr></thead>'
+										+ '<tbody style="display:block;max-height:62px;overflow-y:auto;">';
+									$.each(data, function(i, bill) {
+										html += '<tr style="display:table;width:100%;table-layout:fixed;"><td style="width:30%">' + bill.date + '</td><td style="width:50%">' + bill.customerName + '</td><td style="width:20%">' + bill.total + '</td></tr>';
+									});
+									html += '</tbody></table></div></div>';
+									$('#receiptInfo').html(html);
+								} else {
+									$('#receiptInfo').html('');
 								}
 							});
 						});

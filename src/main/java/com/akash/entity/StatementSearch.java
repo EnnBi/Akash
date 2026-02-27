@@ -10,6 +10,7 @@ public class StatementSearch {
     LocalDate startDate;
     @DateTimeFormat(pattern="dd-MM-yyyy")
     LocalDate endDate;
+    String site;
 
     public String getUserType() {
         return this.userType;
@@ -47,5 +48,13 @@ public class StatementSearch {
         if (endDate == null) {
             this.endDate = LocalDate.of(2050, 12, 31);
         }
+    }
+
+    public String getSite() {
+        return this.site;
+    }
+
+    public void setSite(String site) {
+        this.site = site;
     }
 }

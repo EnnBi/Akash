@@ -67,6 +67,8 @@ public class StatementController {
     Double prevBalance = 0.0;
     Double totalCredit = 0.0;
     Double totalDebit = 0.0;
+    Double totalLoading = 0.0;
+    Double totalUnloading = 0.0;
     String prevDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     DecimalFormat df = new DecimalFormat("#.##");
 
@@ -82,6 +84,8 @@ public class StatementController {
         this.prevBalance = 0.0;
         this.totalCredit = 0.0;
         this.totalDebit = 0.0;
+        this.totalLoading = 0.0;
+        this.totalUnloading = 0.0;
         switch (statementSearch.getUserType()) {
             case "Driver": {
                 model.addAttribute("statements", this.generateDriverStatement(statementSearch, model));
@@ -121,6 +125,8 @@ public class StatementController {
         model.addAttribute("previousBalance", (Object)CommonMethods.format(this.prevBalance));
         model.addAttribute("totalCredit", (Object)CommonMethods.format(this.totalCredit));
         model.addAttribute("totalDebit", (Object)CommonMethods.format(this.totalDebit));
+        model.addAttribute("totalLoading", (Object)CommonMethods.format(this.totalLoading));
+        model.addAttribute("totalUnloading", (Object)CommonMethods.format(this.totalUnloading));
         model.addAttribute("prevDate", (Object)statementSearch.getStartDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         return "statement";
     }
@@ -131,6 +137,8 @@ public class StatementController {
         this.prevBalance = 0.0;
         this.totalCredit = 0.0;
         this.totalDebit = 0.0;
+        this.totalLoading = 0.0;
+        this.totalUnloading = 0.0;
         this.prevDate = statementSearch.getStartDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         switch (statementSearch.getUserType()) {
             case "Driver": {
@@ -268,6 +276,8 @@ public class StatementController {
                 s.setBalance(balance + s.getDebit());
                 balance = balance + s.getDebit();
                 this.totalDebit = this.totalDebit + s.getDebit();
+                this.totalLoading = this.totalLoading + (s.getLoading() != null ? s.getLoading() : 0.0);
+                this.totalUnloading = this.totalUnloading + (s.getUnloading() != null ? s.getUnloading() : 0.0);
                 continue;
             }
             if (s.getCredit() != null) {
@@ -310,19 +320,26 @@ public class StatementController {
         Double balance;
         LocalDate previousDay = search.getStartDate().minusDays(1L);
         this.prevBalance = balance = Double.valueOf(CommonMethods.getCustomerCredit(search.getUser(), LocalDate.MIN, previousDay, this.billBookRepo, this.dayBookRepo, this.goodsReturnRepository, this.clearDuesRepository) - CommonMethods.getCustomerDebit(search.getUser(), LocalDate.MIN, previousDay, this.dayBookRepo));
-        List<BillBook> customerBillBook = this.billBookRepo.findByCustomer_IdAndDateBetween(search.getUser(), search.getStartDate(), search.getEndDate());
+        List<BillBook> customerBillBook;
+        if (search.getSite() != null && !search.getSite().trim().isEmpty()) {
+            customerBillBook = this.billBookRepo.findByCustomer_IdAndDateBetweenAndSitesContainingIgnoreCase(search.getUser(), search.getStartDate(), search.getEndDate(), search.getSite().trim());
+        } else {
+            customerBillBook = this.billBookRepo.findByCustomer_IdAndDateBetween(search.getUser(), search.getStartDate(), search.getEndDate());
+        }
         List<CustomerStatement> billBookCreditEntries = BillBookToCustomerStatement.convert(customerBillBook);
         billBookCreditEntries.forEach(b -> b.setSales(this.billBookRepo.findSalesOnBillBookId(b.getId())));
-        List<CustomerStatement> dayBookCreditEntries = this.dayBookRepo.findCustomerCreditsBetweenDates(search.getUser(), search.getStartDate(), search.getEndDate());
-        List<CustomerStatement> dayBookDebitEntries = this.dayBookRepo.findCustomerDebitsBetweenDates(search.getUser(), search.getStartDate(), search.getEndDate());
-        List<CustomerStatement> clearDuesEntries = this.clearDuesRepository.findCustomerClearDuesBetweenDates(search.getUser(), search.getStartDate(), search.getEndDate());
-        List<CustomerStatement> goodsReturnEntries = this.goodsReturnRepository.findCustomerGoodsReturnBetweenDates(search.getUser(), search.getStartDate(), search.getEndDate());
         ArrayList<CustomerStatement> statements = new ArrayList<CustomerStatement>();
         statements.addAll(billBookCreditEntries);
-        statements.addAll(dayBookCreditEntries);
-        statements.addAll(dayBookDebitEntries);
-        statements.addAll(clearDuesEntries);
-        statements.addAll(goodsReturnEntries);
+        if (search.getSite() == null || search.getSite().trim().isEmpty()) {
+            List<CustomerStatement> dayBookCreditEntries = this.dayBookRepo.findCustomerCreditsBetweenDates(search.getUser(), search.getStartDate(), search.getEndDate());
+            List<CustomerStatement> dayBookDebitEntries = this.dayBookRepo.findCustomerDebitsBetweenDates(search.getUser(), search.getStartDate(), search.getEndDate());
+            List<CustomerStatement> clearDuesEntries = this.clearDuesRepository.findCustomerClearDuesBetweenDates(search.getUser(), search.getStartDate(), search.getEndDate());
+            List<CustomerStatement> goodsReturnEntries = this.goodsReturnRepository.findCustomerGoodsReturnBetweenDates(search.getUser(), search.getStartDate(), search.getEndDate());
+            statements.addAll(dayBookCreditEntries);
+            statements.addAll(dayBookDebitEntries);
+            statements.addAll(clearDuesEntries);
+            statements.addAll(goodsReturnEntries);
+        }
         Collections.sort(statements, (a, b) -> a.getLocalDate().compareTo(b.getLocalDate()));
         for (CustomerStatement s : statements) {
             if ("BillBook".equals(s.getType())) {

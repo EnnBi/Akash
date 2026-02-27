@@ -83,6 +83,11 @@
 		<put-attribute name="body"
 			value="/WEB-INF/views/manufactureSearch.jsp" />
 	</definition>
+	<definition name="cementConsumption" extends="base">
+		<put-attribute name="title" value="Cement Consumption" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/cementConsumption.jsp" />
+	</definition>
 	<definition name="daybook" extends="base">
 		<put-attribute name="title" value="Daybook" />
 		<put-attribute name="body"

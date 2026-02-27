@@ -40,7 +40,7 @@
 			data-toggle="collapse" href="#manufacturing" aria-expanded="false"
 			aria-controls="sidebar-layouts"> <i class="icon-layers menu-icon"></i>
 				<span class="menu-title">Manufacturing</span> <span
-				class="badge badge-warning">2</span>
+				class="badge badge-warning">3</span>
 		</a>
 			<div class="collapse" id="manufacturing">
 				<ul class="nav flex-column sub-menu">
@@ -48,6 +48,8 @@
 						href="${pageContext.request.contextPath}/manufacture">Create</a></li>
 					<li class="nav-item"><a class="nav-link"
 						href="${pageContext.request.contextPath}/manufacture/search">Search</a></li>
+					<li class="nav-item"><a class="nav-link"
+						href="${pageContext.request.contextPath}/manufacture/cement-consumption">Cement Consumption</a></li>
 				</ul>
 			</div></li>
 		<li class="nav-item"><a class="nav-link" data-toggle="collapse"

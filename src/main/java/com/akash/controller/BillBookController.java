@@ -15,15 +15,22 @@ import com.akash.repository.ProductRepository;
 import com.akash.repository.SiteRepository;
 import com.akash.repository.SizeRepository;
 import com.akash.repository.VehicleRepository;
+import com.akash.entity.dto.BillBookDTO;
 import com.akash.repository.projections.LabourCostProj;
+import com.akash.service.WhatsAppService;
 import com.akash.util.CommonMethods;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -73,6 +80,8 @@ public class BillBookController {
     ClearDuesRepository clearDuesRepo;
     @Autowired
     GoodsReturnRepository goodsReturnRepository;
+    @Autowired
+    WhatsAppService whatsAppService;
     int from = 0;
     int total = 0;
     Long records = 0L;
@@ -108,7 +117,7 @@ public class BillBookController {
         billBook.getSales().forEach(s -> s.setBillBook(billBook));
         this.billBookRepository.save(billBook);
         redirectAttributes.addFlashAttribute("success", (Object)"Bill Book saved successfully");
-        return "redirect:/bill-book";
+        return "redirect:/day-book";
     }
 
     @RequestMapping(value={"/save"}, params={"print"}, method={RequestMethod.POST})
@@ -123,7 +132,26 @@ public class BillBookController {
         redirectAttributes.addFlashAttribute("billBookPrint", (Object)billBook);
         redirectAttributes.addFlashAttribute("prevBalance", (Object)prevBalance);
         redirectAttributes.addFlashAttribute("finalBalance", (Object)finalBalance);
-        return "redirect:/bill-book";
+        return "redirect:/day-book";
+    }
+
+    @RequestMapping(value={"/save"}, params={"whatsapp"}, method={RequestMethod.POST})
+    public String saveAndWhatsApp(@ModelAttribute(value="billBook") BillBook billBook, @RequestParam(value="prevBalance") Double prevBalance, @RequestParam(value="finalBalance") Double finalBalance, RedirectAttributes redirectAttributes) {
+        if (billBook.getVehicle() != null) {
+            billBook.setDriver(billBook.getVehicle().getDriver());
+        }
+        this.setLoadingAndUnloadingCharges(billBook);
+        billBook.getSales().forEach(s -> s.setBillBook(billBook));
+        this.billBookRepository.save(billBook);
+        String phone = billBook.getCustomer() != null ? billBook.getCustomer().getContact() : null;
+        if (phone != null && !phone.isEmpty()) {
+            byte[] pdfBytes = this.generatePdfBytes(billBook, prevBalance, finalBalance);
+            this.whatsAppService.sendPdf(pdfBytes, billBook.getReceiptNumber(), phone);
+            redirectAttributes.addFlashAttribute("success", (Object)"Bill saved and sent on WhatsApp");
+        } else {
+            redirectAttributes.addFlashAttribute("success", (Object)"Bill saved (no phone number found for WhatsApp)");
+        }
+        return "redirect:/day-book";
     }
 
     @GetMapping(value={"/edit/{id}"})
@@ -170,6 +198,12 @@ public class BillBookController {
         return CommonMethods.getCustomerBalance(id, LocalDate.MIN, LocalDate.now(), this.billBookRepository, this.dayBookRepo, this.clearDuesRepo, this.goodsReturnRepository);
     }
 
+    @GetMapping(value={"/customer/{id}/sites"})
+    @ResponseBody
+    public List<String> getSitesByCustomer(@PathVariable Long id) {
+        return this.billBookRepository.findDistinctSitesByCustomerId(id);
+    }
+
     @PostMapping(value={"/search"})
     public String searchPost(BillBookSearch billBookSearch, Model model, HttpSession session) {
         session.setAttribute("billBookSearch", (Object)billBookSearch);
@@ -186,8 +220,23 @@ public class BillBookController {
     }
 
     @GetMapping(value={"/receipt/{number}"})
-    public ResponseEntity<?> checkIfReceiptNoExists(@PathVariable String number) {
-        return ResponseEntity.ok((Object)this.billBookRepository.existsByReceiptNumber(number));
+    public ResponseEntity<?> findBillsByReceiptNumber(@PathVariable String number) {
+        List<BillBookDTO> matches = this.billBookRepository.findDTOsByReceiptNumber(number);
+        return ResponseEntity.ok((Object)matches);
+    }
+
+    @GetMapping(value={"/receipt/search"})
+    @ResponseBody
+    public List<Map<String, Object>> searchReceiptNumbers(@RequestParam(value="term") String term) {
+        return this.billBookRepository.searchDTOsByReceiptNumber(term).stream().map(b -> {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", b.getReceiptNumber());
+            map.put("text", b.getReceiptNumber());
+            map.put("customerName", b.getCustomerName());
+            map.put("date", b.getDate() != null ? b.getDate().toString() : "");
+            map.put("total", b.getTotal());
+            return map;
+        }).collect(Collectors.toList());
     }
 
     @GetMapping(value={"/print/{id}"})
@@ -278,6 +327,27 @@ public class BillBookController {
         }
         catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private byte[] generatePdfBytes(BillBook billBook, Double prevBalance, Double finalBalance) {
+        InputStream mainJasperStream = this.getClass().getResourceAsStream("/BillBook.jasper");
+        InputStream subJasperStream = this.getClass().getResourceAsStream("/SalesDetail.jasper");
+        try {
+            JasperReport mainReport = (JasperReport)JRLoader.loadObject((InputStream)mainJasperStream);
+            JasperReport salesReport = (JasperReport)JRLoader.loadObject((InputStream)subJasperStream);
+            HashMap<String, Object> params = new HashMap<String, Object>();
+            params.put("sales", salesReport);
+            params.put("prevBalance", prevBalance);
+            params.put("finalBalance", finalBalance);
+            JRBeanCollectionDataSource data = new JRBeanCollectionDataSource(Arrays.asList(billBook));
+            JasperPrint jasperPrint = JasperFillManager.fillReport((JasperReport)mainReport, params, (JRDataSource)data);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            JasperExportManager.exportReportToPdfStream((JasperPrint)jasperPrint, (OutputStream)baos);
+            return baos.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new byte[0];
         }
     }
 

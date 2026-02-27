@@ -68,6 +68,31 @@ implements ManufactureCustomizedRepository {
         }
     }
 
+    @Override
+    public List<Manufacture> searchCementConsumption(ManufactureSearch manufactureSearch, int from) {
+        CriteriaBuilder cb = this.em.getCriteriaBuilder();
+        CriteriaQuery<Manufacture> cq = cb.createQuery(Manufacture.class);
+        Root<Manufacture> root = cq.from(Manufacture.class);
+        List<Predicate> predicates = this.getPredicates(cb, root, manufactureSearch);
+        cq.select(root).where(predicates.toArray(new Predicate[0]));
+        cq.orderBy(cb.desc(root.get("date")));
+        return this.em.createQuery(cq).setFirstResult(from).setMaxResults(20).getResultList();
+    }
+
+    @Override
+    public long countCementConsumption(ManufactureSearch manufactureSearch) {
+        CriteriaBuilder cb = this.em.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<Manufacture> root = cq.from(Manufacture.class);
+        List<Predicate> predicates = this.getPredicates(cb, root, manufactureSearch);
+        cq.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));
+        try {
+            return this.em.createQuery(cq).getSingleResult();
+        } catch (Exception e) {
+            return 0L;
+        }
+    }
+
     public boolean isNotNullOrNotEmpty(String string) {
         return string != null && !string.isEmpty();
     }

@@ -6,6 +6,7 @@ import com.akash.entity.CustomerStatement;
 import com.akash.entity.DriverStatement;
 import com.akash.entity.LabourStatement;
 import com.akash.entity.SalesStatement;
+import com.akash.entity.dto.BillBookDTO;
 import com.akash.repository.custom.BillBookCustomizedRepository;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,12 @@ public interface BillBookRepository
 extends CrudRepository<BillBook, Long>,
 BillBookCustomizedRepository {
     public boolean existsByReceiptNumber(String receiptNumber);
+
+    @Query("Select new com.akash.entity.dto.BillBookDTO(b.id, b.receiptNumber, b.customer.name, b.customer.address, b.date, b.sites, b.total) from BillBook b where b.receiptNumber = :receiptNumber ORDER BY b.date DESC")
+    public List<BillBookDTO> findDTOsByReceiptNumber(@Param("receiptNumber") String receiptNumber);
+
+    @Query("Select new com.akash.entity.dto.BillBookDTO(b.id, b.receiptNumber, b.customer.name, b.customer.address, b.date, b.sites, b.total) from BillBook b where b.receiptNumber like :term%")
+    public List<BillBookDTO> searchDTOsByReceiptNumber(@Param("term") String term);
 
     @Query(value="Select Sum(b.carraige) from BillBook b where b.driver.id = :id and b.date between :startDate and :endDate")
     public Double sumOfCarraige(@Param(value="id") long id, @Param(value="startDate") LocalDate startDate, @Param(value="endDate") LocalDate endDate);
@@ -61,4 +68,9 @@ BillBookCustomizedRepository {
     public Double findSumOfSold(@Param(value="product") long product, @Param(value="size") long size, @Param(value="startDate") LocalDate startDate, @Param(value="endDate") LocalDate endDate);
 
     public List<BillBook> findByCustomer_IdAndDateBetween(long customerId, LocalDate startDate, LocalDate endDate);
+
+    public List<BillBook> findByCustomer_IdAndDateBetweenAndSitesContainingIgnoreCase(long customerId, LocalDate startDate, LocalDate endDate, String sites);
+
+    @Query("SELECT DISTINCT b.sites FROM BillBook b WHERE b.customer.id = :customerId AND b.sites IS NOT NULL AND b.sites <> ''")
+    public List<String> findDistinctSitesByCustomerId(@Param("customerId") long customerId);
 }

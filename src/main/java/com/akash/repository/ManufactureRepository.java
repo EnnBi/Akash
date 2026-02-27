@@ -25,4 +25,7 @@ ManufactureCustomizedRepository {
 
     @Query(value="Select Sum(m.totalQuantity) from  Manufacture m where m.product.id = :product and m.size.id = :size and (m.date between :startDate and :endDate)")
     public Double findSumOfManufactured(@Param(value="product") long product, @Param(value="size") long size, @Param(value="startDate") LocalDate startDate, @Param(value="endDate") LocalDate endDate);
+
+    @Query(value="SELECT SUM(m.cement) FROM Manufacture m WHERE m.date BETWEEN :startDate AND :endDate")
+    public Double sumCementBetweenDates(@Param(value="startDate") LocalDate startDate, @Param(value="endDate") LocalDate endDate);
 }
