@@ -126,13 +126,17 @@ public class BillBookController {
             billBook.setDriver(billBook.getVehicle().getDriver());
         }
         this.setLoadingAndUnloadingCharges(billBook);
+        billBook.getSales().forEach(s -> s.setBillBook(billBook));
         this.billBookRepository.save(billBook);
+        BillBook saved = this.billBookRepository.findById(billBook.getId()).orElse(billBook);
+        Double dbFinalBalance = this.getBalance(saved.getCustomer().getId());
+        Double dbPrevBalance = dbFinalBalance - saved.getBalance();
         redirectAttributes.addFlashAttribute("success", (Object)"Bill Book saved successfully");
         redirectAttributes.addFlashAttribute("print", (Object)true);
-        redirectAttributes.addFlashAttribute("billBookPrint", (Object)billBook);
-        redirectAttributes.addFlashAttribute("prevBalance", (Object)prevBalance);
-        redirectAttributes.addFlashAttribute("finalBalance", (Object)finalBalance);
-        return "redirect:/day-book";
+        redirectAttributes.addFlashAttribute("billBookPrint", (Object)saved);
+        redirectAttributes.addFlashAttribute("prevBalance", (Object)dbPrevBalance);
+        redirectAttributes.addFlashAttribute("finalBalance", (Object)dbFinalBalance);
+        return "redirect:/bill-book";
     }
 
     @RequestMapping(value={"/save"}, params={"whatsapp"}, method={RequestMethod.POST})
@@ -143,9 +147,12 @@ public class BillBookController {
         this.setLoadingAndUnloadingCharges(billBook);
         billBook.getSales().forEach(s -> s.setBillBook(billBook));
         this.billBookRepository.save(billBook);
-        String phone = billBook.getCustomer() != null ? billBook.getCustomer().getContact() : null;
+        BillBook saved = this.billBookRepository.findById(billBook.getId()).orElse(billBook);
+        Double dbFinalBalance = this.getBalance(saved.getCustomer().getId());
+        Double dbPrevBalance = dbFinalBalance - saved.getBalance();
+        String phone = saved.getCustomer() != null ? saved.getCustomer().getContact() : null;
         if (phone != null && !phone.isEmpty()) {
-            byte[] pdfBytes = this.generatePdfBytes(billBook, prevBalance, finalBalance);
+            byte[] pdfBytes = this.generatePdfBytes(saved, dbPrevBalance, dbFinalBalance);
             boolean sent = this.whatsAppService.sendPdf(pdfBytes, billBook.getReceiptNumber(), phone);
             if (sent) {
                 redirectAttributes.addFlashAttribute("success", (Object)"Bill saved and sent on WhatsApp");

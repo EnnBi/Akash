@@ -383,7 +383,7 @@ line-height: 10px
 						</div>
 						<div class="form-group row float-right">
 							<a class="btn btn-primary btn-fw" style="margin-right: 2rem;"
-								href="${pageContext.request.contextPath}/bill-book/print/${id}">Print</a>
+								href="${pageContext.request.contextPath}/bill-book/print/${billBook.id}?prevBalance=${prevBalance}&finalBalance=${finalBalance}">Print</a>
 						</div>
 					</div>
 				</div>
