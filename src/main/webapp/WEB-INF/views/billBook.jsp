@@ -386,7 +386,7 @@ line-height: 10px
 							<input type="submit" class="btn btn-primary btn-fw" style="margin-right: 2rem;"
 								value="Submit And Print" name="print">
 						</div>
-						<div class="form-group row float-right">
+						<div class="form-group row float-right" style="display:none">
 							<input type="submit" class="btn btn-info btn-fw" style="margin-right: 2rem;"
 								value="Submit And WhatsApp" name="whatsapp">
 						</div>
