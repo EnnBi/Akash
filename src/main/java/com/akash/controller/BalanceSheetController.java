@@ -152,14 +152,14 @@ public class BalanceSheetController {
             System.out.println("appuserName" + appUser.getName());
             Double credit = CommonMethods.getCustomerCredit(appUser.getId(), startDate, endDate, this.billBookRepository, this.dayBookRepo, this.goodsReturnRepository, this.clearDuesRepo);
             balanceSheet.setCredit(credit);
+            totalCredit = totalCredit + credit;
             Double debit = CommonMethods.getCustomerDebit(appUser.getId(), startDate, endDate, this.dayBookRepo);
             balanceSheet.setDebit(debit);
+            totalDebit = totalDebit + debit;
             Double balance = credit - debit;
             balanceSheet.setBalance(balance);
+            totalBalance = totalBalance + balance;
             if (balance >= 50) {
-                totalCredit = totalCredit + credit;
-                totalDebit = totalDebit + debit;
-                totalBalance = totalBalance + balance;
                 balanceSheets.add(balanceSheet);
             }
         }
@@ -185,14 +185,14 @@ public class BalanceSheetController {
             System.out.println("appuserName" + appUser.getName());
             Double credit = CommonMethods.getDriverCredit(appUser.getId(), startDate, endDate, this.dayBookRepo);
             balanceSheet.setCredit(credit);
+            totalCredit = totalCredit + credit;
             Double debit = CommonMethods.getDriverDebit(appUser.getId(), startDate, endDate, this.dayBookRepo, this.billBookRepository, this.appUserRepo);
             balanceSheet.setDebit(debit);
+            totalDebit = totalDebit + debit;
             Double balance = debit - credit;
             balanceSheet.setBalance(balance);
+            totalBalance = totalBalance + balance;
             if (balance >= 50) {
-                totalCredit = totalCredit + credit;
-                totalDebit = totalDebit + debit;
-                totalBalance = totalBalance + balance;
                 balanceSheets.add(balanceSheet);
             }
         }
@@ -218,14 +218,14 @@ public class BalanceSheetController {
             System.out.println("appuserName" + appUser.getName());
             Double credit = CommonMethods.getOwnerCredit(appUser.getId(), startDate, endDate, this.dayBookRepo, this.appUserRepo);
             balanceSheet.setCredit(credit);
+            totalCredit = totalCredit + credit;
             Double debit = CommonMethods.getOwnerDebit(appUser.getId(), startDate, endDate, this.dayBookRepo, this.appUserRepo);
             balanceSheet.setDebit(debit);
+            totalDebit = totalDebit + debit;
             Double balance = debit - credit;
             balanceSheet.setBalance(balance);
+            totalBalance = totalBalance + balance;
             if (balance >= 50) {
-                totalCredit = totalCredit + credit;
-                totalDebit = totalDebit + debit;
-                totalBalance = totalBalance + balance;
                 balanceSheets.add(balanceSheet);
             }
         }
@@ -251,14 +251,14 @@ public class BalanceSheetController {
             System.out.println("appuserName" + appUser.getName());
             Double credit = CommonMethods.getLabourCredit(appUser.getId(), startDate, endDate, this.dayBookRepo);
             balanceSheet.setCredit(credit);
+            totalCredit = totalCredit + credit;
             Double debit = CommonMethods.getLabourDebit(appUser.getId(), startDate, endDate, this.dayBookRepo, this.appUserRepo, this.billBookRepository, this.manufactureRepository);
             balanceSheet.setDebit(debit);
+            totalDebit = totalDebit + debit;
             Double balance = debit - credit;
             balanceSheet.setBalance(balance);
+            totalBalance = totalBalance + balance;
             if (balance >= 50) {
-                totalCredit = totalCredit + credit;
-                totalDebit = totalDebit + debit;
-                totalBalance = totalBalance + balance;
                 balanceSheets.add(balanceSheet);
             }
         }
@@ -283,14 +283,14 @@ public class BalanceSheetController {
             System.out.println("appuserName" + appUser.getName());
             Double credit = CommonMethods.getDealerCredit(appUser.getId(), startDate, endDate, this.dayBookRepo);
             balanceSheet.setCredit(credit);
+            totalCredit = totalCredit + credit;
             Double debit = CommonMethods.getDealerDebit(appUser.getId(), startDate, endDate, this.dayBookRepo, this.rawMaterialRepo);
             balanceSheet.setDebit(debit);
+            totalDebit = totalDebit + debit;
             Double balance = debit - credit;
             balanceSheet.setBalance(balance);
+            totalBalance = totalBalance + balance;
             if (balance >= 50) {
-                totalCredit = totalCredit + credit;
-                totalDebit = totalDebit + debit;
-                totalBalance = totalBalance + balance;
                 balanceSheets.add(balanceSheet);
             }
         }
