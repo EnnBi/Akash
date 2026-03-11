@@ -1,10 +1,12 @@
 package com.akash.controller;
 
+import com.akash.entity.AppUser;
 import com.akash.entity.DayBook;
 import com.akash.entity.DayBookSearch;
 import com.akash.repository.AppUserRepository;
 import com.akash.repository.DayBookRepository;
 import com.akash.repository.UserTypeRepository;
+import java.time.LocalDate;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,19 @@ public class DayBookController {
 
     @GetMapping
     public String add(Model model) {
-        model.addAttribute("dayBook", (Object)new DayBook());
+        DayBook dayBook = new DayBook();
+        if (model.containsAttribute("prefillAmount")) {
+            dayBook.setAmount((Double) model.asMap().get("prefillAmount"));
+        }
+        if (model.containsAttribute("prefillDate")) {
+            dayBook.setDate((LocalDate) model.asMap().get("prefillDate"));
+        }
+        if (model.containsAttribute("prefillUserId")) {
+            AppUser user = new AppUser();
+            user.setId((Long) model.asMap().get("prefillUserId"));
+            dayBook.setUser(user);
+        }
+        model.addAttribute("dayBook", dayBook);
         model.addAttribute("userTypes", (Object)this.userTypeRepository.findAll());
         model.addAttribute("accounts", this.appUserRepository.findByUserType_NameAndActive("Owner", true));
         return "daybook";

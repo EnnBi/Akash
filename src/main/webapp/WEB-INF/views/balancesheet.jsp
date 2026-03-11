@@ -76,19 +76,19 @@
 					<div class="col-md-4">
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Total Credit:</label>
-							<label class="col-sm-8 col-form-label">${totalCredit}</label>
+							<label class="col-sm-8 col-form-label"><fmt:formatNumber value="${totalCredit}" pattern="#,##0.00"/></label>
 						</div>
 					</div>
 					<div class="col-md-4">
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Total Debit:</label>
-							<label class="col-sm-8 col-form-label">${totalDebit}</label>
+							<label class="col-sm-8 col-form-label"><fmt:formatNumber value="${totalDebit}" pattern="#,##0.00"/></label>
 						</div>
 					</div>
 					<div class="col-md-4">
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Total Balance:</label>
-							<label class="col-sm-8 col-form-label">${totalBalance}</label>
+							<label class="col-sm-8 col-form-label"><fmt:formatNumber value="${totalBalance}" pattern="#,##0.00"/></label>
 						</div>
 					</div>
 					
@@ -113,12 +113,10 @@
 								<td>${s.user.name}</td>
 								<td>${s.user.contact}</td>
 								<td>${s.user.address}</td>
-								<td>${s.credit}</td>
-								<td>${s.debit}</td>
-								<td>${s.balance}</td>
-								
+								<td><fmt:formatNumber value="${s.credit}" pattern="#,##0.00"/></td>
+								<td><fmt:formatNumber value="${s.debit}" pattern="#,##0.00"/></td>
+								<td><fmt:formatNumber value="${s.balance}" pattern="#,##0.00"/></td>
 							</tr>
-
 						</c:forEach>
 					</tbody>
 				</table>

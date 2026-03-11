@@ -286,6 +286,23 @@
 	});
 	$(document).ready(function(){
 		$('#users').select2();
+
+		var prefillType = '${prefillType}';
+		var prefillUserId = '${prefillUserId}';
+		if (prefillType) {
+			$('#type').val(prefillType);
+			var url = "${pageContext.request.contextPath}/user-type/" + prefillType + "/users";
+			$.get(url, function(data) {
+				$('#users').find('option').not(':first').remove();
+				$.each(data, function(key, value) {
+					$('#users').append(
+						$("<option></option>").attr("value", value.id).text(value.name));
+				});
+				if (prefillUserId) {
+					$('#users').val(prefillUserId).trigger('change');
+				}
+			});
+		}
 	});
-	
+
 </script>

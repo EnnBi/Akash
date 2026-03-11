@@ -117,6 +117,10 @@ public class BillBookController {
         billBook.getSales().forEach(s -> s.setBillBook(billBook));
         this.billBookRepository.save(billBook);
         redirectAttributes.addFlashAttribute("success", (Object)"Bill Book saved successfully");
+        redirectAttributes.addFlashAttribute("prefillType", billBook.getCustomer().getUserType().getName());
+        redirectAttributes.addFlashAttribute("prefillUserId", billBook.getCustomer().getId());
+        redirectAttributes.addFlashAttribute("prefillAmount", billBook.getPaid());
+        redirectAttributes.addFlashAttribute("prefillDate", billBook.getDate());
         return "redirect:/day-book";
     }
 
