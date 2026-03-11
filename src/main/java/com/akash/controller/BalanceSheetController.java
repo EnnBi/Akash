@@ -156,7 +156,7 @@ public class BalanceSheetController {
             balanceSheet.setDebit(debit);
             Double balance = credit - debit;
             balanceSheet.setBalance(balance);
-            if (Math.abs(balance) >= 50) {
+            if (balance >= 50) {
                 totalCredit = totalCredit + credit;
                 totalDebit = totalDebit + debit;
                 totalBalance = totalBalance + balance;
@@ -189,7 +189,7 @@ public class BalanceSheetController {
             balanceSheet.setDebit(debit);
             Double balance = debit - credit;
             balanceSheet.setBalance(balance);
-            if (Math.abs(balance) >= 50) {
+            if (balance >= 50) {
                 totalCredit = totalCredit + credit;
                 totalDebit = totalDebit + debit;
                 totalBalance = totalBalance + balance;
@@ -222,7 +222,7 @@ public class BalanceSheetController {
             balanceSheet.setDebit(debit);
             Double balance = debit - credit;
             balanceSheet.setBalance(balance);
-            if (Math.abs(balance) >= 50) {
+            if (balance >= 50) {
                 totalCredit = totalCredit + credit;
                 totalDebit = totalDebit + debit;
                 totalBalance = totalBalance + balance;
@@ -255,7 +255,7 @@ public class BalanceSheetController {
             balanceSheet.setDebit(debit);
             Double balance = debit - credit;
             balanceSheet.setBalance(balance);
-            if (Math.abs(balance) >= 50) {
+            if (balance >= 50) {
                 totalCredit = totalCredit + credit;
                 totalDebit = totalDebit + debit;
                 totalBalance = totalBalance + balance;
@@ -287,7 +287,7 @@ public class BalanceSheetController {
             balanceSheet.setDebit(debit);
             Double balance = debit - credit;
             balanceSheet.setBalance(balance);
-            if (Math.abs(balance) >= 50) {
+            if (balance >= 50) {
                 totalCredit = totalCredit + credit;
                 totalDebit = totalDebit + debit;
                 totalBalance = totalBalance + balance;
