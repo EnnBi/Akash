@@ -110,7 +110,7 @@
 					<tbody>
 						<c:forEach items="${balanceSheets}" var="s">
 							<tr>
-								<td>${s.user.name}</td>
+								<td><a href="${pageContext.request.contextPath}/statement?userType=${balanceSheet.userType}&user=${s.user.id}&startDate=${formattedStartDate}&endDate=${formattedEndDate}">${s.user.name}</a></td>
 								<td>${s.user.contact}</td>
 								<td>${s.user.address}</td>
 								<td><fmt:formatNumber value="${s.credit}" pattern="#,##0.00"/></td>

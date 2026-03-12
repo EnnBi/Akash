@@ -42,8 +42,10 @@ import net.sf.jasperreports.engine.util.JRLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping(value={"/statement"})
@@ -73,9 +75,23 @@ public class StatementController {
     DecimalFormat df = new DecimalFormat("#.##");
 
     @RequestMapping(method={RequestMethod.GET})
-    public String statement(Model model) {
-        this.fillModel(model, new StatementSearch());
-        model.addAttribute("statementSearch", (Object)new StatementSearch());
+    public String statement(@RequestParam(required=false) String userType,
+                            @RequestParam(required=false) Long user,
+                            @RequestParam(required=false) @DateTimeFormat(pattern="dd-MM-yyyy") LocalDate startDate,
+                            @RequestParam(required=false) @DateTimeFormat(pattern="dd-MM-yyyy") LocalDate endDate,
+                            Model model) {
+        StatementSearch statementSearch = new StatementSearch();
+        if (userType != null && user != null) {
+            statementSearch.setUserType(userType);
+            statementSearch.setUser(user);
+            statementSearch.setStartDate(startDate);
+            statementSearch.setEndDate(endDate);
+            this.fillModel(model, statementSearch);
+            model.addAttribute("statementSearch", statementSearch);
+            return this.statementShow(statementSearch, model);
+        }
+        this.fillModel(model, statementSearch);
+        model.addAttribute("statementSearch", (Object)statementSearch);
         return "statement";
     }
 

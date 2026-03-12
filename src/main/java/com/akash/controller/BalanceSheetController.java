@@ -102,6 +102,8 @@ public class BalanceSheetController {
         model.addAttribute("totalDebit", map.get("totalDebit"));
         model.addAttribute("totalBalance", map.get("totalBalance"));
         model.addAttribute("balanceSheets", map.get("balanceSheets"));
+        model.addAttribute("formattedStartDate", search.getStartDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        model.addAttribute("formattedEndDate", search.getEndDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         return "balancesheet";
     }
 
